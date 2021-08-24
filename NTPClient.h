@@ -19,10 +19,10 @@ class NTPClient {
     int           _port           = NTP_DEFAULT_LOCAL_PORT;
     int           _timeOffset     = 0;
 
-    unsigned long _updateInterval = 60000;  // In ms
+    uint32_t      _updateInterval = 60000;  // In ms
 
-    unsigned long _currentEpoc    = 0;      // In s
-    unsigned long _lastUpdate     = 0;      // In ms
+    uint32_t      _currentEpoc    = 0;      // In s
+    uint32_t      _lastUpdate     = 0;      // In ms
 
     byte          _packetBuffer[NTP_PACKET_SIZE];
 
@@ -34,7 +34,7 @@ class NTPClient {
     NTPClient(UDP& udp, int timeOffset);
     NTPClient(UDP& udp, const char* poolServerName);
     NTPClient(UDP& udp, const char* poolServerName, int timeOffset);
-    NTPClient(UDP& udp, const char* poolServerName, int timeOffset, unsigned long updateInterval);
+    NTPClient(UDP& udp, const char* poolServerName, int timeOffset, uint32_t updateInterval);
 
     /**
      * Starts the underlying UDP client with the default local port
@@ -75,23 +75,23 @@ class NTPClient {
      * Set the update interval to another frequency. E.g. useful when the
      * timeOffset should not be set in the constructor
      */
-    void setUpdateInterval(unsigned long updateInterval);
+    void setUpdateInterval(uint32_t updateInterval);
 
     /**
     * @return secs argument (or 0 for current time) formatted like `hh:mm:ss`
     */
-    String getFormattedTime(unsigned long secs = 0);
+    String getFormattedTime(uint32_t secs = 0);
 
     /**
      * @return time in seconds since Jan. 1, 1970
      */
-    unsigned long getEpochTime();
+    uint32_t getEpochTime();
   
     /**
     * @return secs argument (or 0 for current date) formatted to ISO 8601
     * like `2004-02-12T15:19:21+00:00`
     */
-    String getFormattedDate(unsigned long secs = 0);
+    String getFormattedDate(uint32_t secs = 0);
 
     /**
      * Stops the underlying UDP client
@@ -101,5 +101,5 @@ class NTPClient {
     /**
     * Replace the NTP-fetched time with seconds since Jan. 1, 1970
     */
-    void setEpochTime(unsigned long secs);
+    void setEpochTime(uint32_t secs);
 };
