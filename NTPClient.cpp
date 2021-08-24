@@ -41,7 +41,7 @@ NTPClient::NTPClient(UDP& udp, const char* poolServerName, int timeOffset) {
   this->_poolServerName = poolServerName;
 }
 
-NTPClient::NTPClient(UDP& udp, const char* poolServerName, int timeOffset, unsigned long updateInterval) {
+NTPClient::NTPClient(UDP& udp, const char* poolServerName, int timeOffset, uint32_t updateInterval) {
   this->_udp            = &udp;
   this->_timeOffset     = timeOffset;
   this->_poolServerName = poolServerName;
@@ -113,11 +113,11 @@ bool NTPClient::forceUpdate() {
 
   this->_lastUpdate = millis() - (10 * (timeout + 1)); // Account for delay in reading the time
 
-  unsigned long highWord = word(this->_packetBuffer[40], this->_packetBuffer[41]);
-  unsigned long lowWord = word(this->_packetBuffer[42], this->_packetBuffer[43]);
+  uint32_t highWord = word(this->_packetBuffer[40], this->_packetBuffer[41]);
+  uint32_t lowWord = word(this->_packetBuffer[42], this->_packetBuffer[43]);
   // combine the four bytes (two words) into a long integer
   // this is NTP time (seconds since Jan 1 1900):
-  unsigned long secsSince1900 = highWord << 16 | lowWord;
+  uint32_t secsSince1900 = highWord << 16 | lowWord;
 
   this->_currentEpoc = secsSince1900 - SEVENZYYEARS;
 
@@ -133,7 +133,7 @@ bool NTPClient::update() {
   return true;
 }
 
-unsigned long NTPClient::getEpochTime() {
+uint32_t NTPClient::getEpochTime() {
   return this->_timeOffset + // User offset
          this->_currentEpoc + // Epoc returned by the NTP server
          ((millis() - this->_lastUpdate) / 1000); // Time since last update
@@ -152,15 +152,15 @@ int NTPClient::getSeconds() {
   return (this->getEpochTime() % 60);
 }
 
-String NTPClient::getFormattedTime(unsigned long secs) {
-  unsigned long rawTime = secs ? secs : this->getEpochTime();
-  unsigned long hours = (rawTime % 86400L) / 3600;
+String NTPClient::getFormattedTime(uint32_t secs) {
+  uint32_t rawTime = secs ? secs : this->getEpochTime();
+  int hours = (rawTime % 86400L) / 3600;
   String hoursStr = hours < 10 ? "0" + String(hours) : String(hours);
 
-  unsigned long minutes = (rawTime % 3600) / 60;
+  int minutes = (rawTime % 3600) / 60;
   String minuteStr = minutes < 10 ? "0" + String(minutes) : String(minutes);
 
-  unsigned long seconds = rawTime % 60;
+  int seconds = rawTime % 60;
   String secondStr = seconds < 10 ? "0" + String(seconds) : String(seconds);
 
   return hoursStr + ":" + minuteStr + ":" + secondStr;
@@ -168,9 +168,9 @@ String NTPClient::getFormattedTime(unsigned long secs) {
 
 // Based on https://github.com/PaulStoffregen/Time/blob/master/Time.cpp
 // currently assumes UTC timezone, instead of using this->_timeOffset
-String NTPClient::getFormattedDate(unsigned long secs) {
-  unsigned long rawTime = (secs ? secs : this->getEpochTime()) / 86400L;  // in days
-  unsigned long days = 0, year = 1970;
+String NTPClient::getFormattedDate(uint32_t secs) {
+  uint32_t rawTime = (secs ? secs : this->getEpochTime()) / 86400L;  // in days
+  int days = 0, year = 1970;
   uint8_t month;
   static const uint8_t monthDays[]={31,28,31,30,31,30,31,31,30,31,30,31};
 
@@ -203,7 +203,7 @@ void NTPClient::setTimeOffset(int timeOffset) {
   this->_timeOffset     = timeOffset;
 }
 
-void NTPClient::setUpdateInterval(unsigned long updateInterval) {
+void NTPClient::setUpdateInterval(uint32_t updateInterval) {
   this->_updateInterval = updateInterval;
 }
 
@@ -229,6 +229,6 @@ void NTPClient::sendNTPPacket() {
   this->_udp->endPacket();
 }
 
-void NTPClient::setEpochTime(unsigned long secs) {
+void NTPClient::setEpochTime(uint32_t secs) {
   this->_currentEpoc = secs;
 }
